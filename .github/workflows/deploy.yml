@@ -1,0 +1,140 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: 18
+  PM2_APP_NAME: nextjs-dev
+  DEPLOY_PATH: /var/www/frontend
+  APP_PORT: 3000
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Create production env file
+      run: |
+        echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" > .env
+        echo "✅ Environment file created"
+
+    - name: Install dependencies
+      run: |
+        npm ci --force
+        echo "✅ Dependencies installed"
+
+    - name: Build Next.js app
+      run: |
+        npm run build
+        echo "✅ Build completed"
+
+    - name: Prepare deployment package
+      run: |
+        echo "📦 Checking files for deployment..."
+        
+        # Create a list of files that exist
+        FILES_TO_ARCHIVE=""
+        for file in .next package.json package-lock.json public .env; do
+          if [ -e "$file" ]; then
+            FILES_TO_ARCHIVE="$FILES_TO_ARCHIVE $file"
+          fi
+        done
+        
+        # Optional config files
+        for config in next.config.js postcss.config.js tailwind.config.js; do
+          if [ -f "$config" ]; then
+            FILES_TO_ARCHIVE="$FILES_TO_ARCHIVE $config"
+          fi
+        done
+        
+        echo "📝 Files to be archived:$FILES_TO_ARCHIVE"
+        
+        # Create deployment package
+        sudo tar -czf deploy.tar.gz $FILES_TO_ARCHIVE
+
+        # Verify package
+        if [ ! -s "deploy.tar.gz" ]; then
+          echo "❌ Deployment package is empty"
+          exit 1
+        fi
+        
+        echo "✅ Deployment package created ($(ls -lh deploy.tar.gz | awk '{print $5}'))"
+
+    - name: Upload deployment package to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        source: "deploy.tar.gz"
+        target: "${{ env.DEPLOY_PATH }}"
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script_stop: true
+        envs: DEPLOY_PATH,PM2_APP_NAME,APP_PORT
+        script: |
+          # Ensure deploy directory exists
+          sudo mkdir -p $DEPLOY_PATH
+          sudo chown -R $USER:$USER $DEPLOY_PATH
+          
+          # Stop the current PM2 process before backup
+          sudo pm2 stop $PM2_APP_NAME 2>/dev/null || true
+          
+          # Backup current deployment with warning suppression
+          if [ -d "$DEPLOY_PATH/.next" ]; then
+            echo " Creating backup..."
+            cd $DEPLOY_PATH
+            sudo tar --warning=no-file-changed -czf \
+              "./backup-$(date +%Y%m%d_%H%M%S).tar.gz" \
+              .next package.json package-lock.json public .env 2>/dev/null || true
+          fi
+          
+          # Clean current deployment
+          echo "🧹 Cleaning current deployment..."
+          cd $DEPLOY_PATH
+          sudo rm -rf .next node_modules
+          
+          # Extract new deployment
+          echo "📦 Extracting new deployment..."
+          sudo tar -xzf deploy.tar.gz
+          
+          # Install production dependencies
+          echo "📦 Installing production dependencies..."
+          sudo npm ci --production --force
+          
+          # Ensure PM2 is installed
+          if ! command -v pm2 &> /dev/null; then
+            echo "Installing PM2..."
+            sudo npm install -g pm2
+          fi
+          
+          # Update PM2 process
+          echo "🔄 Updating PM2 process..."
+          # sudo pm2 delete $PM2_APP_NAME 2>/dev/null || true
+          # sudo pm2 start npm --name $PM2_APP_NAME -- start -- --port $APP_PORT
+          # sudo pm2 save
+          
+          # Cleanup
+          echo "🧹 Cleaning up..."
+          sudo rm -f deploy.tar.gz
+          
+          echo "✅ Deployment completed successfully"
