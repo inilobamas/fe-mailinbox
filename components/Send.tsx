@@ -13,6 +13,7 @@ import { Textarea } from './ui/textarea';
 import LoadingProcessingPage from './ProcessLoading';
 import FooterNav from './FooterNav';
 import LoadingUploadingPage from './UploadLoading ';
+import DOMPurify from 'dompurify';
 
 // Interfaces
 interface UploadedAttachment {
@@ -377,7 +378,11 @@ const Send: React.FC = () => {
                     type="email"
                     placeholder="Recipient's email"
                     value={to}
-                    onChange={(e) => setTo(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                      setTo(sanitizedValue)
+                    }}
                   />
                 </div>
               </div>
@@ -387,7 +392,11 @@ const Send: React.FC = () => {
                   id="subject"
                   placeholder="Subject"
                   value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                    setSubject(sanitizedValue)
+                  }}
                 />
               </div>
               <div className="mb-4">
@@ -397,7 +406,11 @@ const Send: React.FC = () => {
                   rows={13}
                   placeholder="Compose email"
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const sanitizedValue = DOMPurify.sanitize(value); // Sanitize
+                    setMessage(sanitizedValue)
+                  }}
                 />
               </div>
               <div className="mt-4 space-y-2">

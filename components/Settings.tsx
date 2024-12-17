@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import PasswordInput from './PasswordInput';
 import { useRouter } from "next/navigation";
+import DOMPurify from 'dompurify';
 
 const Settings: React.FC = () => {
   const router = useRouter();
@@ -135,7 +136,8 @@ const Settings: React.FC = () => {
               value={currentPassword}
               onChange={(e) => {
                 const value = e.target.value;
-                setCurrentPassword(value.replace(/\s/g, '')); // Remove spaces
+                const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                setCurrentPassword(sanitizedValue); // Remove spaces
               }}
               showPassword={showCurrentPassword}
               setShowPassword={setShowCurrentPassword}
@@ -147,7 +149,8 @@ const Settings: React.FC = () => {
               value={newPassword}
               onChange={(e) => {
                 const value = e.target.value;
-                setNewPassword(value.replace(/\s/g, '')); // Remove spaces
+                const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                setNewPassword(sanitizedValue);
               }}
               showPassword={showNewPassword}
               setShowPassword={setShowNewPassword}
@@ -158,7 +161,8 @@ const Settings: React.FC = () => {
               value={confirmPassword}
               onChange={(e) => {
                 const value = e.target.value;
-                setConfirmPassword(value.replace(/\s/g, '')); // Remove spaces
+                const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                setConfirmPassword(sanitizedValue);
               }}
               showPassword={showConfirmPassword}
               setShowPassword={setShowConfirmPassword}

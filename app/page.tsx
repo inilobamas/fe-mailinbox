@@ -11,6 +11,7 @@ import axios from "axios";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import PasswordInput from "@/components/PasswordInput";
+import DOMPurify from 'dompurify';
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -166,7 +167,8 @@ export default function LandingPage() {
                   value={loginEmail}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setLoginEmail(value.replace(/\s/g, '')); // Remove spaces
+                    const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                    setLoginEmail(sanitizedValue);
                   }}
                   type="text"
                   className="pl-10 h-12 text-base border-gray-200 shadow appearance-none"
@@ -184,7 +186,8 @@ export default function LandingPage() {
                   value={password}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setPassword(value.replace(/\s/g, '')); // Remove spaces
+                    const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                    setPassword(sanitizedValue);
                   }}
                   showPassword={showPassword}
                   setShowPassword={setShowPassword}

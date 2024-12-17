@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import PasswordInput from '@/components/PasswordInput';
 import LoadingProcessingPage from '@/components/ProcessLoading';
+import DOMPurify from 'dompurify';
 
 interface EmailUser {
     user_encode_id: string;
@@ -332,7 +333,8 @@ const EmailManagementPageContent: React.FC = () => {
                         value={searchTerm}
                         onChange={(e) => {
                             const value = e.target.value;
-                            handleSearch(value);
+                            const sanitizedValue = DOMPurify.sanitize(value); // Sanitize
+                            handleSearch(sanitizedValue);
                         }}
                     />
                     <Toaster />
@@ -429,7 +431,8 @@ const EmailManagementPageContent: React.FC = () => {
                                     value={passwordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showPassword}
                                     setShowPassword={setShowPassword}
@@ -440,7 +443,8 @@ const EmailManagementPageContent: React.FC = () => {
                                     value={confirmPasswordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setConfirmPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setConfirmPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showCPassword}
                                     setShowPassword={setShowCPassword}

@@ -12,6 +12,7 @@ import axios from 'axios'
 import DomainSelector from "@/components/DomainSelector"
 import LoadingProcessingPage from "@/components/ProcessLoading"
 import { useRouter } from "next/dist/client/components/navigation"
+import DOMPurify from 'dompurify';
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => (
@@ -264,7 +265,8 @@ const CreateBulkEmailPageContent: React.FC = () => {
                   const value = e.target.value.toLowerCase();
                   setBaseName(value.replace(/\s/g, '')); // Remove spaces
                   const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, '');
-                  setBaseName(sanitizedValue);
+                  const domPurifyValue = DOMPurify.sanitize(sanitizedValue); // Sanitize
+                  setBaseName(domPurifyValue);
                 }}
                 disabled={isRandomNameActive}
               />
@@ -282,7 +284,8 @@ const CreateBulkEmailPageContent: React.FC = () => {
                 value={password}
                 onChange={(e) => {
                   const value = e.target.value;
-                  setPassword(value.replace(/\s/g, '')); // Remove spaces
+                  const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                  setPassword(sanitizedValue); // Remove spaces
                 }}
                 placeholder="Password"
                 className={isRandomPasswordActive ? "shadow appearance-non flex-1 h-12 bg-gray-300" : "shadow appearance-non flex-1 h-12"}
@@ -306,7 +309,8 @@ const CreateBulkEmailPageContent: React.FC = () => {
               value={receiveEmail}
               onChange={(e) => {
                 const value = e.target.value;
-                setReceiveEmail(value.replace(/\s/g, '')); // Remove spaces
+                const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                setReceiveEmail(sanitizedValue); // Remove spaces
               }}
               placeholder="Email for receiving list"
               className="shadow appearance-non h-12"

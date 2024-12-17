@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import DomainSelector from "@/components/DomainSelector";
 import LoadingProcessingPage from "@/components/ProcessLoading";
 import { useRouter } from "next/navigation";
+import DOMPurify from 'dompurify';
 
 // Loading fallback component
 const LoadingFallback: React.FC = () => (
@@ -198,8 +199,9 @@ const CreateSingleEmailPageContent: React.FC = () => {
                 type="text"
                 value={password}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\s/g, ''); // Remove spaces
-                  setPassword(value);
+                  const value = e.target.value;
+                  const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                  setPassword(sanitizedValue);
                 }}
                 placeholder="Password"
                 className={

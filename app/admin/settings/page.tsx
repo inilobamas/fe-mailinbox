@@ -20,6 +20,7 @@ import FooterAdminNav from "@/components/FooterAdminNav";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import PasswordInput from "@/components/PasswordInput";
+import DOMPurify from 'dompurify';
 // import LoadingProcessingPage from '@/components/ProcessLoading';
 
 // Loading fallback component
@@ -506,7 +507,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={passwordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showPassword}
                                     setShowPassword={setShowPassword}
@@ -517,7 +519,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={confirmPasswordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setConfirmPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setConfirmPasswordForAdmin(sanitizedValue); // Remove spaces
                                     }}
                                     showPassword={showCPassword}
                                     setShowPassword={setShowCPassword}
@@ -558,7 +561,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={oldPasswordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setOldPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setOldPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showOPassword}
                                     setShowPassword={setShowOPassword}
@@ -569,7 +573,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={passwordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showPassword}
                                     setShowPassword={setShowPassword}
@@ -580,7 +585,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={confirmPasswordForAdmin}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setConfirmPasswordForAdmin(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setConfirmPasswordForAdmin(sanitizedValue);
                                     }}
                                     showPassword={showCPassword}
                                     setShowPassword={setShowCPassword}
@@ -638,7 +644,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                             value={newAdminEmail}
                                             onChange={(e) => {
                                                 const value = e.target.value;
-                                                setNewAdminEmail(value.replace(/\s/g, '')); // Remove spaces
+                                                const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                                setNewAdminEmail(sanitizedValue); // Remove spaces
                                             }}
                                         />
                                     </div>
@@ -649,7 +656,8 @@ const UserAdminManagementPageContent: React.FC = () => {
                                     value={newAdminPassword}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        setNewAdminPassword(value.replace(/\s/g, '')); // Remove spaces
+                                        const sanitizedValue = DOMPurify.sanitize(value).replace(/\s/g, ''); // Sanitize and remove spaces
+                                        setNewAdminPassword(sanitizedValue); // Remove spaces
                                     }}
                                     showPassword={showPassword}
                                     setShowPassword={setShowPassword}
